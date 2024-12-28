@@ -1,22 +1,22 @@
 from pydca.pydca.cascade.network_units import UnsupervisedUnit
 import flax
 from flax import linen as nn
-from typing import Any, Callable, Sequence, Optional
+from typing import Sequence
 
-import jax.numpy as np
+
 class MLP(nn.Module):
-  features: Sequence[int]
+    features: Sequence[int]
+
 
 @nn.compact
 def __call__(self, x):
     for feat in self.features[:-1]:
-      x = flax.nn.relu(nn.Dense(feat)(x))
+        x = flax.nn.relu(nn.Dense(feat)(x))
     x = nn.Dense(self.features[-1])(x)
     return x
 
 
 class AutoEncoder(UnsupervisedUnit):
-
     def __init__(self, loss_function):
         super().__init__(loss_function)
 

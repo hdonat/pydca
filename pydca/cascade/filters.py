@@ -1,5 +1,7 @@
 import numpy as np
 from sklearn.preprocessing import StandardScaler
+
+
 class Filter:
     def __init__(self):
         pass
@@ -13,9 +15,11 @@ class Filter:
     def __str__(self):
         return "$\all$"
 
+
 class LinkedFilter(Filter):
-    def __init__(self, other_filter = None):
+    def __init__(self, other_filter=None):
         self._linked_filter = other_filter
+
 
 class ZScoreFilter(LinkedFilter):
     def __init__(self, name=None, linked_filter=None):
@@ -39,6 +43,7 @@ class ZScoreFilter(LinkedFilter):
     def __str__(self):
         return "$Z-Score$"
 
+
 class PickInputFilter(Filter):
     def __init__(self, columns, network_position):
         self._columns = columns
@@ -53,6 +58,7 @@ class PickInputFilter(Filter):
     def __str__(self):
         return "pick  " + str(self._columns) + " from " + str(self._network_position)
 
+
 class FilterResolution(Filter):
     def __init__(self, orginal_data_size, new_size, start_of_reducable_data=5):
         super().__init__()
@@ -61,32 +67,36 @@ class FilterResolution(Filter):
         self._orginal_data_size = orginal_data_size
 
     def filter(self, data):
-        osize = self._orginal_data_size 
-       # print(osize)
+        osize = self._orginal_data_size
+        # print(osize)
         size = data.shape[1]
         print(int(self._new_size))
-        indexes = np.array(range(0,osize,int(self._new_size)))
+        indexes = np.array(range(0, osize, int(self._new_size)))
         indexes *= 4
         print(indexes)
-        indexes = np.array([[i,i+1,i+2,i+3] for i in indexes]).flatten() # TODO refactor to be used with changing arch point size
+        indexes = np.array(
+            [[i, i + 1, i + 2, i + 3] for i in indexes]
+        ).flatten()  # TODO refactor to be used with changing arch point size
         indexes += self._start_of_reducable_data + 1
-        indexes = list(range(6)) + indexes.tolist() + list(range((osize)*4 + self._start_of_reducable_data +1,size))
+        indexes = (
+            list(range(6))
+            + indexes.tolist()
+            + list(range((osize) * 4 + self._start_of_reducable_data + 1, size))
+        )
         print(indexes)
         return data[:, indexes]
+
 
 class FilterCalculateError(Filter):
     def __init__(self, tlayer, input_size, output_size):
         super().__init__()
         self._t_out = tlayer.get_data()
         if self._t_out is None:
-            pdb.set_trace()
+            raise Exception("Target layer has no data")
         self._input_size = input_size
         self._output_size = output_size
 
     def filter(self, data):
-        X = data[:,0:self._input_size]
-        y_hat = data[:,-1 - self._output_size:-1]
-        return np.hstack([X,self._t_out-y_hat, data[:,1:]])
-
-
-
+        X = data[:, 0 : self._input_size]
+        y_hat = data[:, -1 - self._output_size : -1]
+        return np.hstack([X, self._t_out - y_hat, data[:, 1:]])

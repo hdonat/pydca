@@ -1,12 +1,9 @@
 import os
-import pdb
 
-import scipy.io
-import numpy as np
-import os
 from pathlib import Path
 
 from .NetworkUnit import NetworkUnit
+
 
 class MatlabELM(NetworkUnit):
     def __init__(self, eng, name):
@@ -19,19 +16,21 @@ class MatlabELM(NetworkUnit):
         # print("Include MLT Toolbox")
         # self.eng.include_paths(nargout=0)
         cwd = os.getcwd()
-        eng.eval("cd " + os.environ["MLT_ROOT"].replace("~",str(Path.home())) + "/src")
+        eng.eval("cd " + os.environ["MLT_ROOT"].replace("~", str(Path.home())) + "/src")
         eng.eval("mlt_include_paths")
         eng.eval("cd " + cwd)
         self.eng = eng
         self.name = name
         self.initialized = False
 
-    def initialize_network_model(self, ):
+    def initialize_network_model(
+        self,
+    ):
         pass
 
     def train(self):
-        #pdb.set_trace()
-        self.eng.eval(self.name+".train(X,Y)")
+        # pdb.set_trace()
+        self.eng.eval(self.name + ".train(X,Y)")
         return self.activate()
 
     def casscade_train(self):
@@ -48,7 +47,7 @@ class MatlabELM(NetworkUnit):
         self.train()
 
     def activate(self):
-        self.eng.eval("simpleELMOutput = "+self.name+".apply(X)")
+        self.eng.eval("simpleELMOutput = " + self.name + ".apply(X)")
         elm_output = self.eng.get("simpleELMOutput")
         return elm_output
 
@@ -65,15 +64,18 @@ class MatlabELM(NetworkUnit):
 
     def set_output(self, elm_output):
         np_a = elm_output
-        #np_a = np_a.reshape(elm_output.size).transpose()
-        #pdb.set_trace()
-        if not (self.output_layer is None):
+        # np_a = np_a.reshape(elm_output.size).transpose()
+        # pdb.set_trace()
+        if self.output_layer is not None:
             self.output_layer.set_state(np_a)
         return np_a
 
+
 class SimpleELM(MatlabELM):
-    def __init__(self,eng,name, hidden_size, reg = 0.0000006, normalize = False, bip=False):
-        MatlabELM.__init__(self,eng,name)
+    def __init__(
+        self, eng, name, hidden_size, reg=0.0000006, normalize=False, bip=False
+    ):
+        MatlabELM.__init__(self, eng, name)
         self._hsize = hidden_size
         self._bip = bip
         self._normalize = normalize
@@ -84,10 +86,17 @@ class SimpleELM(MatlabELM):
         self.eng.workspace.Y = Y
 
         bip = 1 if self._bip else 0
-        self.eng.eval(self.name + "= ELM(size(X,2), size(Y,2), {'class', 'ELM'; 'hidDim'," +str(self._hsize) + "; 'BIP', "+str(bip)+"})")
+        self.eng.eval(
+            self.name
+            + "= ELM(size(X,2), size(Y,2), {'class', 'ELM'; 'hidDim',"
+            + str(self._hsize)
+            + "; 'BIP', "
+            + str(bip)
+            + "})"
+        )
         if not self._normalize:
-            self.eng.eval(self.name+".inpNormalization = 0")
-            self.eng.eval(self.name+".outNormalization = 0")
-        self.eng.eval(self.name+".reg =" + str(self._reg))
-        self.eng.eval(self.name+".init(X,Y)")
+            self.eng.eval(self.name + ".inpNormalization = 0")
+            self.eng.eval(self.name + ".outNormalization = 0")
+        self.eng.eval(self.name + ".reg =" + str(self._reg))
+        self.eng.eval(self.name + ".init(X,Y)")
         self.initialized = True

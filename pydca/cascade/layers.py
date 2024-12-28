@@ -1,14 +1,15 @@
 #!/usr/bin/python
-#-*- coding: utf-8 -*-
-import pdb
+# -*- coding: utf-8 -*-
 
 import numpy as np
-from .filters import *
+from .filters import Filter
+
 
 class LayerState(dict):
     """
     State representation for layer states
     """
+
     def __init__(self):
         super().__init__()
 
@@ -21,11 +22,13 @@ class LayerState(dict):
     def __delitem__(self, key):
         del self.store[self._keytransform(key)]
 
+
 class Layer:
     """
     Basic Layer Class
     """
-    def __init__(self, number, label: str = None, filter = None, restrict_output = None):
+
+    def __init__(self, number, label: str = None, filter=None, restrict_output=None):
         self.current_state = {}
         self.connected_layers = []
         self._position = number
@@ -60,10 +63,13 @@ class Layer:
 
     def connect_and_send_data_to(self, layer):
         self.connected_layers.append(layer)
-        if self._position in self.current_state.keys():    #TODO refactor. Do not use keys()
+        if (
+            self._position in self.current_state.keys()
+        ):  # TODO refactor. Do not use keys()
             last_data = self.current_state[self._position]
-            self.update_data(self._position, self._filter.in_filter(last_data, self._position))
-
+            self.update_data(
+                self._position, self._filter.in_filter(last_data, self._position)
+            )
 
     def set_state(self, data):
         self.update_data(self._position, self._filter.in_filter(data, self._position))
@@ -72,13 +78,17 @@ class Layer:
         self.current_state = {}
 
     def update_data(self, entity, data):
-        self.current_state[entity] = data  # TODO inefficent, but ! if jax or numpy used generality is lost (vec -> mat)
+        self.current_state[entity] = (
+            data  # TODO inefficent, but ! if jax or numpy used generality is lost (vec -> mat)
+        )
         for layer in self.connected_layers:
             layer.update_data(entity, data)
 
     def get_data(self):
         if self._restrict_output is None:
-            states = [self.current_state[key] for key in sorted(self.current_state.keys())] # get order form 0 to n
+            states = [
+                self.current_state[key] for key in sorted(self.current_state.keys())
+            ]  # get order form 0 to n
             print(self._position)
             if 1 == len(states):
                 return_state = states[0]
@@ -89,13 +99,17 @@ class Layer:
         else:
             return self.current_state[self._restrict_output]
 
-
     def get_normalized_data(self):
-        states = [self.current_state[key] for key in sorted(self.current_state.keys())]  # get order form 0 to n
+        states = [
+            self.current_state[key] for key in sorted(self.current_state.keys())
+        ]  # get order form 0 to n
         if 1 == len(states):
             return_state = states[0]
         else:
-            states = [state/state.shape[1] if len(state.shape) > 1 else state for state in states]
+            states = [
+                state / state.shape[1] if len(state.shape) > 1 else state
+                for state in states
+            ]
             return_state = np.hstack(states)
 
         return return_state

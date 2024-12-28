@@ -1,0 +1,43 @@
+[project]
+name = "pydca"
+version = "0.1.0"
+description = 'This package contains classes and functions for implementing direct cascaded machine learning models described by Littmann and Ritter.'
+authors = [
+    { name = "Heiko Donat", email = "info@hdonat.net" }
+]
+dependencies = [
+    "numpy>=2.2.1",
+    "pandas>=2.2.3",
+    "torch>=2.5.1",
+    "scikit-learn>=1.6.0",
+    "matplotlib>=3.10.0",
+    "graphviz>=0.20.3",
+    "scikit-optimize>=0.10.2",
+    "qpsolvers[osqp]>=4.4.0",
+    "keras>=3.7.0",
+    "tensorflow>=2.18.0",
+]
+readme = "README.md"
+requires-python = ">= 3.8"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.rye]
+managed = true
+dev-dependencies = [
+    "pytest>=8.3.4",
+]
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["pydca"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
