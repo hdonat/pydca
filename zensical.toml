@@ -2,7 +2,7 @@
 site_name = "pyDCA"
 site_description = "Direct cascaded machine learning models described by Littmann and Ritter."
 site_author = "Heiko Donat"
-copyright = "Copyright &copy; 2019 Heiko Donat"
+copyright = "Copyright &copy; 2019&ndash;2026 Heiko Donat. Licensed under the EUPL-1.2."
 nav = [
   { "Home" = "index.md" },
   { "API reference" = [

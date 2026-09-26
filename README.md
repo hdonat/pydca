@@ -292,4 +292,8 @@ Heiko Donat (info@hdonat.net)
 
 ## License
 
-This project is licensed under the MIT License.
+Copyright © 2019–2026 Heiko Donat
+
+Licensed under the EUPL, version 1.2 ([EUPL-1.2](https://interoperable-europe.ec.europa.eu/collection/eupl/eupl-text-eupl-12)).
+The full licence text is in the file [`LICENSE`](LICENSE). The EUPL is available in all
+official languages of the European Union; all language versions are equally valid.
