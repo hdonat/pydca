@@ -7,7 +7,6 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
-   learning_models.matlab
    learning_models.torch
 
 Submodules
